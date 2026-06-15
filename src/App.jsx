@@ -27,3 +27,17 @@ function App() {
 }
 
 export default App;
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+function App() {
+  return (
+    <Routes>
+      {/* Your existing routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/shop" element={<Shop />} />
+
+      {/* ADD THIS CATCH-ALL AT THE VERY BOTTOM */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
