@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://aura-gems-1.onrender.com/api';
 
 export const fetchProducts = async (category = 'All', isPremium = false) => {
   try {
@@ -29,12 +29,12 @@ export const submitContact = async (formData) => {
       },
       body: JSON.stringify(formData),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to submit contact form');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Error submitting contact form:', error);
