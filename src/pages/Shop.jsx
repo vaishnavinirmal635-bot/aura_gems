@@ -83,11 +83,21 @@ const Shop = () => {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-          {displayProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-32 w-full">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
+          </div>
+        ) : displayProducts.length === 0 ? (
+          <div className="text-center py-32 text-gray-500 font-montserrat tracking-widest uppercase w-full">
+            No products found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            {displayProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
         {/* Load More */}
         {visibleCount < filteredProducts.length && (

@@ -129,33 +129,43 @@ const Collections = () => {
 
         {/* Product Grid */}
         <main className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-10">
-            {products.map((product) => (
-              <div key={product.id} className="group">
-                <div className="bg-white border border-gray-100 rounded-lg p-4 mb-4 transition-shadow hover:shadow-md">
-                  <div className="aspect-square relative overflow-hidden rounded-md mb-2">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
-                    />
+          {loading ? (
+            <div className="flex justify-center items-center py-32 w-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-32 text-gray-500 font-montserrat tracking-widest uppercase w-full">
+              No products found
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-10">
+              {products.map((product) => (
+                <div key={product.id} className="group">
+                  <div className="bg-white border border-gray-100 rounded-lg p-4 mb-4 transition-shadow hover:shadow-md">
+                    <div className="aspect-square relative overflow-hidden rounded-md mb-2">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1 px-1">
+                    <h3 className="text-[13px] font-medium leading-tight h-8 line-clamp-2">{product.name}</h3>
+                    <p className="text-[15px] font-bold">{product.price}</p>
+                  </div>
+                  <div className="flex gap-2 mt-4 px-1">
+                    <button className="flex-1 py-2 text-[11px] font-bold border border-black rounded hover:bg-gray-50 transition-colors uppercase tracking-tight">
+                      View Details
+                    </button>
+                    <button className="flex-1 py-2 text-[11px] font-bold bg-black text-white rounded hover:bg-navy transition-colors uppercase tracking-tight">
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
-                <div className="space-y-1 px-1">
-                  <h3 className="text-[13px] font-medium leading-tight h-8 line-clamp-2">{product.name}</h3>
-                  <p className="text-[15px] font-bold">{product.price}</p>
-                </div>
-                <div className="flex gap-2 mt-4 px-1">
-                  <button className="flex-1 py-2 text-[11px] font-bold border border-black rounded hover:bg-gray-50 transition-colors uppercase tracking-tight">
-                    View Details
-                  </button>
-                  <button className="flex-1 py-2 text-[11px] font-bold bg-black text-white rounded hover:bg-navy transition-colors uppercase tracking-tight">
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </div>

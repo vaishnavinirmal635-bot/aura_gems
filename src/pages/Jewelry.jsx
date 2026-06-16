@@ -31,11 +31,21 @@ const Jewelry = () => {
 
       {/* Grid */}
       <div className="container mx-auto px-6 py-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-32">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-32 text-gray-500 font-montserrat tracking-widest uppercase">
+            No products found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
 
       <ServiceBar />
