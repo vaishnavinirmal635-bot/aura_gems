@@ -1,7 +1,10 @@
-// Connect to local backend during development to avoid Render cold start delays
-const API_URL = import.meta.env.DEV 
+const rawApiUrl = import.meta.env.DEV 
   ? 'http://localhost:5000/api' 
   : (import.meta.env.VITE_API_URL || 'https://aura-gems-1.onrender.com/api');
+
+// Ensure the API URL ends with '/api' and handle trailing slashes
+const cleanUrl = rawApiUrl.replace(/\/+$/, '');
+const API_URL = cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
 
 // Helper function to fetch with timeout to prevent hanging on Render cold starts
 const fetchWithTimeout = async (resource, options = {}) => {
