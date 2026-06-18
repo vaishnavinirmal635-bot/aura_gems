@@ -56,7 +56,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://aura-gems-1val.vercel.app', 'https://aura-gems-beryl.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -71,7 +71,7 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 const Product = require('./models/Product');
-const productsData = [/* copy paste your array from seed.js here */];
+const productsData = products;
 
 app.get('/api/seed-database-secret', async (req, res) => {
   try {
