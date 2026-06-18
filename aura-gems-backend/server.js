@@ -1,3 +1,12 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/db');
+const Product = require('./models/Product');
+const productRoutes = require('./routes/productRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+
+// ─── Full Products Data ───────────────────────────────────────────────────────
 const products = [
   // Shop Products
   { name: "Diamond Eternity Ring", price: "$15,000", category: "Rings", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=800", isPremium: false },
@@ -21,7 +30,7 @@ const products = [
   { name: "Diamond Studs 2ct", price: "$35,000", category: "Earrings", image: "https://images.unsplash.com/photo-1615655406736-b37c4fabf923?auto=format&fit=crop&q=80&w=800", isPremium: false },
   { name: "Minimalist Gold Band", price: "$1,200", category: "Rings", image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80&w=800", isPremium: false },
 
-  // Collections Products (that are not already duplicates)
+  // Collections Products
   { name: "Luna Diamond Solitaire", price: "$1,299", category: "Collections", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=800", isPremium: false },
   { name: "Gold Diamond Chain", price: "$1,299", category: "Collections", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800", isPremium: false },
   { name: "Pearl Diamond Earrings", price: "$1,299", category: "Collections", image: "/emerald.png", isPremium: false },
@@ -33,7 +42,7 @@ const products = [
   { name: "Cham Diamond Necklaces", price: "$1,399", category: "Collections", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800", isPremium: false },
   { name: "Many Diamond Ring", price: "$1,299", category: "Collections", image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80&w=800", isPremium: false },
 
-  // Jewelry/Premium Products (not already duplicates)
+  // Premium / Fine Jewelry Products
   { name: "The Royal Diamond Tiara", price: "$125,000", category: "Collections", image: "/tiara.png", isPremium: true },
   { name: "Imperial Emerald Necklace", price: "$85,000", category: "Necklaces", image: "/emerald.png", isPremium: true },
   { name: "Solitaire Diamond Ring", price: "$45,000", category: "Rings", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=800", isPremium: true },
@@ -41,24 +50,12 @@ const products = [
   { name: "Sapphire & Diamond Bracelet", price: "$65,000", category: "Bracelets", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800", isPremium: true },
   { name: "Ruby Pendant Necklace", price: "$42,000", category: "Necklaces", image: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&q=80&w=800", isPremium: true },
 ];
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
 
-const productRoutes = require('./routes/productRoutes');
-const contactRoutes = require('./routes/contactRoutes');
-
-// Connect to database
-connectDB();
-
+// ─── App Setup ────────────────────────────────────────────────────────────────
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 // Routes
@@ -69,20 +66,39 @@ app.get('/', (req, res) => {
   res.send('Aura Gems API is running...');
 });
 
-const PORT = process.env.PORT || 5000;
-const Product = require('./models/Product');
-const productsData = products;
-
+// ─── Manual Seed Route ────────────────────────────────────────────────────────
 app.get('/api/seed-database-secret', async (req, res) => {
   try {
     await Product.deleteMany({});
-    await Product.insertMany(productsData);
-    res.send('Database successfully populated with products!');
+    await Product.insertMany(products);
+    res.send(`Database successfully populated with ${products.length} products!`);
   } catch (err) {
     res.status(500).send('Error seeding data: ' + err.message);
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// ─── Start Server & Auto-Seed if DB is empty ─────────────────────────────────
+const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  await connectDB();
+
+  // Auto-seed database if it has no products
+  const count = await Product.countDocuments();
+  if (count === 0) {
+    console.log('Database is empty. Auto-seeding products...');
+    await Product.insertMany(products);
+    console.log(`✅ Auto-seeded ${products.length} products into the database.`);
+  } else {
+    console.log(`ℹ️  Database already has ${count} products. Skipping auto-seed.`);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+};
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err.message);
+  process.exit(1);
 });

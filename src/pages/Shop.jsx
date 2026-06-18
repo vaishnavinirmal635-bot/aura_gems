@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProducts } from '../services/api';
+import { fetchProducts, FALLBACK_PRODUCTS, applyFilters } from '../services/api';
 import ProductCard from '../components/Product/ProductCard';
 import { FiFilter, FiChevronDown } from 'react-icons/fi';
 
 const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(8);
-
   const categories = ['All', 'Rings', 'Necklaces', 'Earrings', 'Bracelets', 'Collections'];
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize instantly with all fallback products — no spinner on first load
+  const [products, setProducts] = useState(FALLBACK_PRODUCTS);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      setLoading(true);
+    // Silently fetch live data from API in the background
+    const loadLiveProducts = async () => {
       const data = await fetchProducts();
-      setProducts(data);
-      setLoading(false);
+      if (data && data.length > 0) {
+        setProducts(data);
+      }
     };
-    loadProducts();
+    loadLiveProducts();
   }, []);
 
-  const filteredProducts = activeCategory === 'All' 
-    ? products 
+  const filteredProducts = activeCategory === 'All'
+    ? products
     : products.filter(p => p.category === activeCategory);
 
   const displayProducts = filteredProducts.slice(0, visibleCount);
 
   const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 4, products.length));
+    setVisibleCount(prev => Math.min(prev + 4, filteredProducts.length));
   };
 
   return (
@@ -37,9 +37,9 @@ const Shop = () => {
       {/* Shop Hero */}
       <div className="relative h-[400px] overflow-hidden flex items-center">
         <div className="absolute inset-0 bg-navy/60 z-10" />
-        <img 
-          src="/hero.png" 
-          alt="Luxury Boutique" 
+        <img
+          src="/hero.png"
+          alt="Luxury Boutique"
           className="absolute inset-0 w-full h-full object-cover scale-105 animate-reveal"
         />
         <div className="container mx-auto px-6 relative z-20 text-center">
@@ -83,26 +83,16 @@ const Shop = () => {
         </div>
 
         {/* Product Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-32 w-full">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
-          </div>
-        ) : displayProducts.length === 0 ? (
-          <div className="text-center py-32 text-gray-500 font-montserrat tracking-widest uppercase w-full">
-            No products found
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-            {displayProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          {displayProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
 
         {/* Load More */}
         {visibleCount < filteredProducts.length && (
           <div className="mt-20 text-center">
-            <button 
+            <button
               onClick={handleLoadMore}
               className="border border-navy text-navy px-12 py-4 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-navy hover:text-white transition-all duration-300"
             >
